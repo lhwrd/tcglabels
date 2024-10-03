@@ -24,7 +24,7 @@ requires = ["poetry-core"]
 build-backend = "poetry.core.masonry.api"
 
 [tool.mypy]
-plugins = ["django-stubs.main"]
+plugins = ["mypy_django_plugin.main"]
 
 [tool.django-stubs]
 django_settings_module = "tcglabels.settings"
