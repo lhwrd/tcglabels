@@ -1,6 +1,10 @@
+import random
+from uuid import uuid4
+
 import reflex as rx
 from reflex.vars import BooleanVar
 
+from ..label_generator import Font, LabelGenerator
 from ..models import Card
 from ..template import template
 
@@ -25,14 +29,13 @@ class LabelSettingsState(rx.State):
         self.label_size = size
 
     @rx.var
-    def font_enum(self) -> str:
+    def font_enum(self) -> Font:
         font_map = {
-            "Arial": "ARIAL",
-            "Verdana": "VERDANA",
-            "Comic Sans MS": "COMIC_SANS_MS",
-            "Times New Roman": "TIMES_NEW_ROMAN",
+            "Arial": Font.ARIAL,
+            "Opensans": Font.OPENSANS,
+            "Opensans Bold": Font.OPENSANS_BOLD,
         }
-        return font_map.get(self.font, "ARIAL")  # Default to ARIAL if not found
+        return font_map.get(self.font, Font.ARIAL)  # Default to ARIAL if not found
 
     @rx.event
     def set_font(self, font: str) -> None:
@@ -110,15 +113,23 @@ class CardsTableState(rx.State):
         return len(self.selected_card_numbers)
 
     @rx.event
-    async def generate_labels(self) -> None:
+    async def generate_labels(self):
         """Generate labels for selected cards."""
         selected_cards = [
             card for card in self.cards if card.number in self.selected_card_numbers
         ]
-        print(
-            f"Generating labels for {len(selected_cards)} cards with size "
-            + f"{LabelSettingsState.label_dimensions} and font "
-            + LabelSettingsState.font_enum
+        size = await self.get_var_value(LabelSettingsState.label_dimensions)
+        font = await self.get_var_value(LabelSettingsState.font_enum)
+        generator = LabelGenerator(size=size, font=font)
+        guid = uuid4()
+        data = generator.generate_labels_pdf_bytes(cards=selected_cards)
+        return rx.download(data=data, filename=f"labels_{guid}.pdf")
+
+    @rx.event
+    def download_random_data(self):
+        return rx.download(
+            data=",".join([str(random.randint(0, 100)) for _ in range(10)]),
+            filename="random_numbers.csv",
         )
 
 
@@ -219,7 +230,7 @@ def search_config() -> rx.Component:
                 rx.hstack(
                     rx.text("Font"),
                     rx.select(
-                        ["Arial", "Verdana", "Comic Sans MS", "Times New Roman"],
+                        ["Arial", "Opensans", "Opensans Bold"],
                         name="font",
                         default_value="Arial",
                         width="200px",
@@ -235,8 +246,7 @@ def search_config() -> rx.Component:
                     on_click=CardsTableState.generate_labels,
                 ),
                 spacing="8",
-            ),
-            on_submit=None,  # No submit action yet, just configuration
+            )
         ),
         padding="4",
         margin_top="4",
