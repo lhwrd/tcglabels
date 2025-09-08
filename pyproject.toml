@@ -1,23 +1,18 @@
-[tool.poetry]
+[project]
 name = "tcglabels"
 version = "0.1.0"
-description = ""
-authors = ["Lucas Howard <lhoward96@gmail.com>"]
+description = "Add your description here"
 readme = "README.md"
+requires-python = ">=3.13"
+dependencies = [
+    "pillow>=11.3.0",
+    "reflex>=0.8.9",
+    "reflex-enterprise>=0.3.2",
+]
 
-[tool.poetry.dependencies]
-python = "^3.12"
-Django = "^5.1.1"
-requests = "^2.32.3"
-pillow = "^10.4.0"
-python-decouple = "^3.8"
-
-[tool.poetry.group.dev.dependencies]
-pytest-django = "^4.9.0"
-pytest-cov = "^5.0.0"
-pre-commit = "^3.8.0"
-djlint = "^1.35.2"
-
-[build-system]
-requires = ["poetry-core"]
-build-backend = "poetry.core.masonry.api"
+[dependency-groups]
+dev = [
+    "isort>=6.0.1",
+    "pre-commit>=4.3.0",
+    "pytest>=8.4.1",
+]
