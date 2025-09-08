@@ -16,3 +16,5 @@ What are the main features? Search for cards, select cards, configure label outp
 What technologies will be used? Python, Reflex
 
 How will users interact with it? Via a web application.
+
+Refer to Reflex documentation for building web applications: https://reflex.dev/docs/getting-started/introduction
