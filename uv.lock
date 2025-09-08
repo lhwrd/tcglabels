@@ -86,6 +86,15 @@ wheels = [
 ]
 
 [[package]]
+name = "dacite"
+version = "1.9.2"
+source = { registry = "https://pypi.org/simple" }
+sdist = { url = "https://files.pythonhosted.org/packages/55/a0/7ca79796e799a3e782045d29bf052b5cde7439a2bbb17f15ff44f7aacc63/dacite-1.9.2.tar.gz", hash = "sha256:6ccc3b299727c7aa17582f0021f6ae14d5de47c7227932c47fec4cdfefd26f09", size = 22420 }
+wheels = [
+    { url = "https://files.pythonhosted.org/packages/94/35/386550fd60316d1e37eccdda609b074113298f23cef5bddb2049823fe666/dacite-1.9.2-py3-none-any.whl", hash = "sha256:053f7c3f5128ca2e9aceb66892b1a3c8936d02c686e707bee96e19deef4bc4a0", size = 16600 },
+]
+
+[[package]]
 name = "distlib"
 version = "0.4.0"
 source = { registry = "https://pypi.org/simple" }
@@ -683,12 +692,25 @@ wheels = [
 ]
 
 [[package]]
+name = "tcgdex-sdk"
+version = "2.2.0"
+source = { registry = "https://pypi.org/simple" }
+dependencies = [
+    { name = "dacite" },
+]
+sdist = { url = "https://files.pythonhosted.org/packages/9b/e9/7db5c6687c062d4d35f6d9e3b8619a25ec3e3891ea063a5c4276759bbbd0/tcgdex_sdk-2.2.0.tar.gz", hash = "sha256:edd2eb949fb8ac161de3b48e5579da9e075cb1605b6a3e15ba6f5e541219e21d", size = 3560146 }
+wheels = [
+    { url = "https://files.pythonhosted.org/packages/68/fe/986504c0059a962489b691f09771d2c191b32a04dd416a5c996451150127/tcgdex_sdk-2.2.0-py3-none-any.whl", hash = "sha256:d6813696f952fa0a4f03b595dfc18b400c3d32256efd0adc533dc8f70b59d184", size = 15515 },
+]
+
+[[package]]
 name = "tcglabels"
 version = "0.1.0"
 source = { virtual = "." }
 dependencies = [
     { name = "pillow" },
     { name = "reflex" },
+    { name = "tcgdex-sdk" },
 ]
 
 [package.dev-dependencies]
@@ -702,6 +724,7 @@ dev = [
 requires-dist = [
     { name = "pillow", specifier = ">=11.3.0" },
     { name = "reflex", specifier = ">=0.8.9" },
+    { name = "tcgdex-sdk", specifier = ">=2.2.0" },
 ]
 
 [package.metadata.requires-dev]

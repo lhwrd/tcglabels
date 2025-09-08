@@ -7,10 +7,15 @@ requires-python = ">=3.13"
 dependencies = [
     "pillow>=11.3.0",
     "reflex>=0.8.9",
+    "tcgdex-sdk>=2.2.0",
 ]
 
 [dependency-groups]
-dev = ["isort>=6.0.1", "pre-commit>=4.3.0", "pytest>=8.4.1"]
+dev = [
+    "isort>=6.0.1",
+    "pre-commit>=4.3.0",
+    "pytest>=8.4.1",
+]
 
 [tool.flake8]
 max-line-length = 88
