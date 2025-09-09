@@ -16,9 +16,10 @@ class LabelSettingsState(rx.State):
     @rx.var
     def label_dimensions(self) -> tuple[int, int]:
         size_map = {
-            'Small (2"x1")': (200, 100),
-            'Medium (3"x2")': (300, 200),
-            'Large (4"x3")': (400, 300),
+            '1.2"x0.8"': (360, 240),
+            '1.5"x0.5"': (450, 150),
+            '2.0"x1.0"': (600, 300),
+            '2.25"x1.5"': (675, 450),
         }
         return size_map.get(
             self.label_size, (300, 200)
@@ -219,9 +220,9 @@ def search_config() -> rx.Component:
                 rx.hstack(
                     rx.text("Label Size"),
                     rx.select(
-                        ['Small (2"x1")', 'Medium (3"x2")', 'Large (4"x3")'],
+                        ['1.2"x0.8"', '1.5"x0.5"', '2.0"x1.0"', '2.25"x1.5"'],
                         name="label_size",
-                        default_value='Medium (3"x2")',
+                        default_value='1.5"x0.5"',
                         width="200px",
                         on_change=LabelSettingsState.set_label_size,
                     ),
