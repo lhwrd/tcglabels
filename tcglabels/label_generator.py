@@ -29,7 +29,7 @@ class Font(Enum):
 class LabelGenerator:
     def __init__(
         self,
-        size: tuple[int, ...],
+        size: tuple[int, int] | list[int],
         font: Font,
     ):
         """Initialize the LabelGenerator.
@@ -52,7 +52,7 @@ class LabelGenerator:
             output_path (str): The path where the label image will be saved.
 
         """
-        img = Image.new("RGB", self.size, color="white")
+        img = Image.new("RGB", size=self.size, color="white")
 
         draw = ImageDraw.Draw(img)
 
