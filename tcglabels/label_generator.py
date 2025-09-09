@@ -5,7 +5,8 @@ from io import BytesIO
 from pathlib import Path
 
 from PIL import Image, ImageDraw, ImageFont
-from tcgdexsdk.models.Card import Card
+
+from .models import Card
 
 
 def truncate_string(s, max_length):
@@ -70,9 +71,11 @@ class LabelGenerator:
         )
 
         # Draw the second line of text
-        line2 = [str(card.id).upper(), str(card.rarity).upper()]
+        line2 = [str(card.number).upper(), str(card.rarity)]
+        if card.finish:
+            line2.append(str(card.finish))
         line2 = " ".join(line2)
-        line2 = truncate_string(line2, 29)
+        line2 = truncate_string(line2, int(self.size[0] * 0.05))
         line2_y = int(self.size[1] * 0.35)
         draw.text(
             (self._starting_x, line2_y),
@@ -83,7 +86,7 @@ class LabelGenerator:
         )
 
         # Draw third line
-        line3 = truncate_string(card.set.name, 29)
+        line3 = truncate_string(card.set_name, int(self.size[0] * 0.05))
         line3_y = int(self.size[1] * 0.65)
         draw.text(
             (self._starting_x, line3_y),
@@ -107,7 +110,7 @@ class LabelGenerator:
         """
         os.makedirs(output_dir, exist_ok=True)
         for card in cards:
-            output_path = f"{output_dir}/label_{card.id}.png"
+            output_path = f"{output_dir}/label_{card.unique_id}.png"
             self.generate_label(card, output_path)
 
     def generate_labels_pdf(
@@ -125,7 +128,7 @@ class LabelGenerator:
         """
         images = []
         for card in cards:
-            img_path = f"/tmp/label_{card.id}.png"
+            img_path = f"/tmp/label_{card.unique_id}.png"
             self.generate_label(card, img_path)
             img = Image.open(img_path).convert("RGB")
             images.append(img)
@@ -158,7 +161,7 @@ class LabelGenerator:
 
         images = []
         for card in cards:
-            img_path = f"/tmp/label_{card.id}.png"
+            img_path = f"/tmp/label_{card.unique_id}.png"
             self.generate_label(card, img_path)
             img = Image.open(img_path).convert("RGB")
             images.append(img)

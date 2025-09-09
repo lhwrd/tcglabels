@@ -21,8 +21,8 @@ def navbar() -> rx.Component:
                 ),
                 rx.hstack(
                     navbar_link("Home", "/#"),
-                    navbar_link("About", "/#"),
-                    navbar_link("Order Labels", "/#"),
+                    navbar_link("Search", "/search"),
+                    navbar_link("From Dex", "/from-dex"),
                     justify="end",
                     spacing="5",
                 ),
@@ -46,8 +46,8 @@ def navbar() -> rx.Component:
                     rx.menu.trigger(rx.icon("menu", size=30)),
                     rx.menu.content(
                         rx.menu.item("Home"),
-                        rx.menu.item("About"),
-                        rx.menu.item("Order Labels"),
+                        rx.menu.item("Search"),
+                        rx.menu.item("From Dex"),
                     ),
                     justify="end",
                 ),
