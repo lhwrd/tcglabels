@@ -1,11 +1,12 @@
-import random
+from typing import Sequence
 from uuid import uuid4
 
 import reflex as rx
 from reflex.vars import BooleanVar
+from tcgdexsdk.models.Card import Card
 
 from ..label_generator import Font, LabelGenerator
-from ..models import Card
+from ..tcg_search import search_cards
 from ..template import template
 
 
@@ -22,7 +23,7 @@ class LabelSettingsState(rx.State):
             '2.25"x1.5"': (675, 450),
         }
         return size_map.get(
-            self.label_size, (300, 200)
+            self.label_size, (450, 150)
         )  # Default to Medium if not found
 
     @rx.event
@@ -44,80 +45,62 @@ class LabelSettingsState(rx.State):
 
 
 class CardsTableState(rx.State):
-    cards: rx.Field[list[Card]] = rx.field(
+    cards: rx.Field[Sequence[Card]] = rx.field(
         default_factory=list
     )  # List of card instances
-    selected_card_numbers: rx.Field[list[str]] = rx.field(
+    selected_card_ids: rx.Field[list[str]] = rx.field(
         default_factory=list
-    )  # List of selected card numbers (unique id)
+    )  # List of selected card ids (unique id)
+    searching: rx.Field[bool] = rx.field(default=False)
 
     @rx.event
-    def search_cards(self, form_data: dict) -> None:
+    async def search_cards(self, form_data: dict) -> None:
         """Search for cards based on form data and update the state."""
-        # Example: populate with dicts
-        self.cards = [
-            Card(
-                name="Pikachu",
-                set_name="Base Set",
-                rarity="Common",
-                number="58",
-                finish="Holo",
-            ),
-            Card(
-                name="Charizard",
-                set_name="Base Set",
-                rarity="Rare",
-                number="4",
-                finish="Holo",
-            ),
-            Card(
-                name="Bulbasaur",
-                set_name="Base Set",
-                rarity="Common",
-                number="1",
-                finish="Non-Holo",
-            ),
+        print(f"Searching with form data: {form_data}")
+        self.searching = True
+        results = await search_cards(form_data)
+        self.cards = results
+        self.searching = False
+        self.selected_card_ids = self.selected_card_ids + [
+            card.id for card in self.cards
         ]
-        self.selected_card_numbers = []
 
     @rx.event
     def toggle_all_selected(self) -> None:
         """Toggle selection state of all cards."""
-        if len(self.selected_card_numbers) == len(self.cards):
-            self.selected_card_numbers = []
+        if len(self.selected_card_ids) == len(self.cards):
+            self.selected_card_ids = []
         else:
-            self.selected_card_numbers = [card.number for card in self.cards]
+            self.selected_card_ids = [card.id for card in self.cards]
 
     @rx.var
     def all_selected(self) -> bool:
-        return (
-            len(self.selected_card_numbers) == len(self.cards) and len(self.cards) > 0
-        )
+        return len(self.selected_card_ids) == len(self.cards) and len(self.cards) > 0
 
     @rx.var
     def any_selected(self) -> bool:
-        return len(self.selected_card_numbers) > 0
+        return len(self.selected_card_ids) > 0
 
     @rx.var
     def indeterminate(self) -> bool:
         return self.any_selected and not self.all_selected
 
     @rx.event
-    def toggle_card_selected(self, number: str) -> None:
-        if number in self.selected_card_numbers:
-            self.selected_card_numbers.remove(number)
+    def toggle_card_selected(self, card_id: str) -> None:
+        if card_id in self.selected_card_ids:
+            self.selected_card_ids.remove(card_id)
         else:
-            self.selected_card_numbers.append(number)
+            self.selected_card_ids.append(card_id)
 
     @rx.var
     def selected_count(self) -> int:
-        return len(self.selected_card_numbers)
+        return len(self.selected_card_ids)
 
     @rx.event
     async def generate_labels(self):
         """Generate labels for selected cards."""
         selected_cards = [
-            card for card in self.cards if card.number in self.selected_card_numbers
+            card for card in self.cards if card.id in self.selected_card_ids
         ]
         size = await self.get_var_value(LabelSettingsState.label_dimensions)
         font = await self.get_var_value(LabelSettingsState.font_enum)
@@ -125,13 +108,6 @@ class CardsTableState(rx.State):
         guid = uuid4()
         data = generator.generate_labels_pdf_bytes(cards=selected_cards)
         return rx.download(data=data, filename=f"labels_{guid}.pdf")
-
-    @rx.event
-    def download_random_data(self):
-        return rx.download(
-            data=",".join([str(random.randint(0, 100)) for _ in range(10)]),
-            filename="random_numbers.csv",
-        )
 
 
 def search_form() -> rx.Component:
@@ -141,9 +117,13 @@ def search_form() -> rx.Component:
             rx.input(placeholder="Card Name", name="name"),
             rx.input(placeholder="Set Name", name="set_name"),
             rx.input(placeholder="Rarity", name="rarity"),
-            rx.input(placeholder="Number", name="number"),
+            rx.input(placeholder="ID", name="id"),
             rx.input(placeholder="Finish", name="finish"),
-            rx.button("Search", type="submit"),
+            rx.cond(
+                CardsTableState.searching,
+                rx.button("Searching...", type="submit"),
+                rx.button("Search", type="submit"),
+            ),
             spacing="4",
         ),
         on_submit=CardsTableState.search_cards,
@@ -160,23 +140,21 @@ def dynamic_select_icon(selected: bool | BooleanVar):
 
 
 def show_card_row(card: Card) -> rx.Component:
-    selected = CardsTableState.selected_card_numbers.contains(card.number)
+    selected = CardsTableState.selected_card_ids.contains(card.id)
 
     return rx.table.row(
         rx.table.cell(
             rx.icon_button(
                 dynamic_select_icon(selected),
                 color_scheme=rx.cond(selected, "blue", "gray"),
-                on_click=lambda: CardsTableState.toggle_card_selected(
-                    number=card.number
-                ),
+                on_click=lambda: CardsTableState.toggle_card_selected(card_id=card.id),
             )
         ),
         rx.table.row_header_cell(card.name),
-        rx.table.cell(card.set_name),
+        rx.table.cell(card.set.name),
         rx.table.cell(card.rarity),
-        rx.table.cell(card.number),
-        rx.table.cell(card.finish),
+        rx.table.cell(card.id),
+        rx.table.cell(""),
     )
 
 
