@@ -4,7 +4,7 @@ from .label_generator import Font
 
 
 class LabelSettingsState(rx.State):
-    label_size: rx.Field[str] = rx.field(default='Medium (3"x2")')
+    label_size: rx.Field[str] = rx.field(default='1.5"x0.5"')
     font: rx.Field[str] = rx.field(default="Arial")
 
     @rx.var
