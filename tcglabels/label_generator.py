@@ -41,7 +41,6 @@ class LabelGenerator:
         """
         self.size = size
         self.font = font
-        print(size, font)
         self._starting_x = int(size[0] * 0.05)
 
     def generate_label(self, card: Card, output_path: str) -> None:
