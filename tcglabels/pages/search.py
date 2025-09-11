@@ -2,6 +2,7 @@ from typing import Sequence
 from uuid import uuid4
 
 import reflex as rx
+from reflex.state import State
 from reflex.vars import BooleanVar
 
 from ..label_generator import LabelGenerator
@@ -11,7 +12,7 @@ from ..tcg_search import search_cards
 from ..template import template
 
 
-class CardsTableState(rx.State):
+class CardsTableState(State):
     cards: rx.Field[Sequence[Card]] = rx.field(
         default_factory=list
     )  # List of card instances
@@ -27,10 +28,10 @@ class CardsTableState(rx.State):
         self.searching = True
         results = await search_cards(form_data)
         self.cards = results
-        self.searching = False
         self.selected_card_numbers = self.selected_card_numbers + [
             card.unique_id for card in self.cards
         ]
+        self.searching = False
 
     @rx.event
     def toggle_all_selected(self) -> None:
