@@ -21,7 +21,6 @@ class DexImportState(rx.State):
         for file in files:
             content = await file.read()
             # Parse the CSV content
-            print(f"Uploaded file: {file.name}, size: {len(content)} bytes")
             try:
                 decoded = content.decode("utf-8")
             except UnicodeDecodeError:
