@@ -24,7 +24,6 @@ class CardsTableState(State):
     @rx.event
     async def search_cards(self, form_data: dict) -> None:
         """Search for cards based on form data and update the state."""
-        print(f"Searching with form data: {form_data}")
         self.searching = True
         results = await search_cards(form_data)
         self.cards = results
