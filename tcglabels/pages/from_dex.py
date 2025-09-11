@@ -31,7 +31,6 @@ class DexImportState(rx.State):
             reader = csv.DictReader(decoded.splitlines(), delimiter=";")
             cards = []
             for row in reader:
-                print(row)
                 cards.append(
                     Card(
                         number=row.get("Id", ""),
