@@ -1,12 +1,26 @@
 # tcglabels
 
-`tcglabels.com` is a web application that allows you to create custom labels for your trading card game (TCG) collection. You can create labels for your cards, decks, binders, and more.
+`tcglabels` is a web application that allows you to create custom labels for the empty slots in your Pokemon TCG collection.
 
 ## Features
 
 - Create custom labels for your TCG collection
-- Choose from a variety of label templates
-- Customize the text, font, and color of your labels
-- Save your labels to your device or print them directly from the app
+- Search for cards from TCG Dex (https://tcgdex.com/)
+- Import your card collection from a CSV file exported from the Dex App (https://dexapp.io/)
+- Customize the size and font of your labels
+- Download your labels to your device
 
-## Technologies
+## Usage
+
+1. Use `uv` to run the application locally:
+
+   ```bash
+   uv run reflex run
+   ```
+
+2. Open your web browser and navigate to `http://localhost:3000` to access the application.
+
+## Technologies Used
+
+- Python
+- Reflex (https://reflex.dev/)
